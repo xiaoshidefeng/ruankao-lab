@@ -1,0 +1,31 @@
+{
+  "name": "ruankao-lab",
+  "private": true,
+  "version": "0.1.0",
+  "description": "软考系统架构设计师 · 练习与模拟考平台",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:all": "concurrently -n server,web -c blue,green \"npm run server\" \"vite\"",
+    "server": "node server/index.mjs",
+    "db:seed": "node server/seed.mjs",
+    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "bank:parse": "node scripts/parse-mocks.mjs"
+  },
+  "dependencies": {
+    "concurrently": "^10.0.5",
+    "express": "^5.2.1",
+    "mysql2": "^3.24.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

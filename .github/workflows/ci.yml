@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  web-build:
+    name: 前端类型检查与构建
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build   # tsc --noEmit + vite build
+
+  server-smoke:
+    name: API + MySQL 冒烟
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ruankao
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping -proot"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=20
+    env:
+      DB_PASS: root
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run db:seed
+      - name: 启动 API 并验证
+        run: |
+          npm run server &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8787/api/health && break
+            sleep 1
+          done
+          curl -sf http://localhost:8787/api/bank | grep -q '"questions"'
+          curl -sf -X POST http://localhost:8787/api/actions \
+            -H 'Content-Type: application/json' \
+            -d '{"type":"answer","qid":"ci-smoke","correct":false}'
+          curl -sf http://localhost:8787/api/state | grep -q 'ci-smoke'

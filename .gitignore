@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+
+# 正式题库有版权归属，不入开源仓库（见 README「题库版权策略」）
+src/data/bank.json
+
+# 解析质检报告含第三方题面片段，同属不入仓库内容（本地复跑即生成）
+scripts/bank-report.json

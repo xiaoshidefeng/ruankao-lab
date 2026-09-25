@@ -41,6 +41,14 @@ RK_SRC_ROOT="/你的资料目录/7、模拟题" pnpm bank:parse
 - 仓库内置的 `bank.sample.json` 全部为**自创演示题**，可自由使用与修改，用于开发、演示与 CI。
 - 如果你拥有题目内容的合法授权或自创了题库，欢迎通过 PR 讨论数据格式的改进，但请勿向仓库提交无授权的第三方题目。
 
+## 界面
+
+| 今日 | 章节练习 · 即答即判 | 论文写作 |
+|---|---|---|
+| ![今日](docs/screenshots/home.png) | ![章节练习](docs/screenshots/practice.png) | ![论文写作](docs/screenshots/essay.png) |
+
+*截图为内置示例题库（自创演示题）+ MySQL 模式下的首跑状态。*
+
 ## 功能地图
 
 | 模块 | 说明 |

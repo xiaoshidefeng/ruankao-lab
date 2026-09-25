@@ -4,6 +4,10 @@
   "version": "0.1.0",
   "description": "软考系统架构设计师 · 练习与模拟考平台",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiaoshidefeng/ruankao-lab.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

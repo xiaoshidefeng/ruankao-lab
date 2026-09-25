@@ -2,12 +2,12 @@
    题库读 MySQL（seed 脚本从 src/data/bank.json 导入），用户学习记录以
    /api/actions 动作语义写库（与前端 store.ts 本地逻辑一一对应）。 */
 import express from "express";
-import { pool, initSchema, loadState, applyActions } from "./db.mjs";
+import { pool, initSchema, loadState, applyActions, resolveUser } from "./db.mjs";
 import { seedBank, seedIfEmpty } from "./seed.mjs";
 
 const PORT = Number(process.env.PORT || 8787);
 const app = express();
-app.use(express.json({ limit: "2mb" }));
+app.use(express.json({ limit: "4mb" }));
 
 const ok = (res, data) => res.json({ ok: true, data });
 const fail = (res, err, code = 500) => {
@@ -61,9 +61,9 @@ app.get("/api/bank", async (_req, res) => {
 });
 
 /** 全量用户状态（启动时水合前端 AppState） */
-app.get("/api/state", async (_req, res) => {
+app.get("/api/state", async (req, res) => {
   try {
-    ok(res, await loadState());
+    ok(res, await loadState(resolveUser(req)));
   } catch (err) {
     fail(res, err);
   }
@@ -76,7 +76,7 @@ app.post("/api/actions", async (req, res) => {
     if (!batch.length || !batch.every((a) => a && typeof a.type === "string")) {
       return fail(res, new Error("bad action batch"), 400);
     }
-    const results = await applyActions(batch);
+    const results = await applyActions(batch, resolveUser(req));
     const failed = results.filter((r) => !r.ok);
     if (failed.length === results.length) return fail(res, new Error(failed[0].error));
     ok(res, { results });

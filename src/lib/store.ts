@@ -3,7 +3,7 @@
    进入 mysql 模式——启动用服务端状态水合，之后每个动作本地即时生效并
    异步推送落库；后端失联自动回退 localStorage，重载后以服务端为准。 */
 import { useSyncExternalStore } from "react";
-import type { AppState, MockAttempt, QStat, WrongCause, WrongEntry } from "./types";
+import type { AppState, EssayDraft, EssayReviewItem, MockAttempt, QStat, WrongCause, WrongEntry } from "./types";
 import { DAY, todayStr } from "./grading";
 import { backendStatus, probeBackend, pushAction, setBackendStatusListener, type BackendStatus } from "./api";
 
@@ -16,6 +16,7 @@ const emptyState: AppState = {
   attempts: {},
   activity: {},
   caseSelf: {},
+  essays: {},
 };
 
 function load(): AppState {
@@ -205,6 +206,67 @@ export function setCaseSelf(caseId: string, subqNo: number, rate: "good" | "mid"
   else cur[subqNo] = rate;
   setState({ caseSelf: { ...state.caseSelf, [caseId]: cur } });
   pushAction({ type: "case-self", caseId, subqNo, rate: rate ?? null });
+}
+
+/* ---------------- 论文写作 ---------------- */
+
+export function createEssay(topicId: string, durationMin: number): EssayDraft {
+  const id = `essay-${topicId}-${Date.now().toString(36)}`;
+  const essay: EssayDraft = {
+    id,
+    topicId,
+    startedAt: Date.now(),
+    savedAt: Date.now(),
+    abstract: "",
+    body: "",
+    elapsedSec: 0,
+    status: "ongoing",
+  };
+  setState({ essays: { ...state.essays, [id]: essay } });
+  pushAction({ type: "essay-create", essay });
+  return essay;
+}
+
+export function saveEssay(essay: EssayDraft) {
+  const saved = { ...essay, savedAt: Date.now() };
+  setState({ essays: { ...state.essays, [essay.id]: saved } });
+  pushAction({ type: "essay-save", essay: saved });
+}
+
+/** 交卷：正文/摘要以提交时刻内容为准；返回终稿（视图据其切换到复盘界面） */
+export function submitEssay(essay: EssayDraft): EssayDraft {
+  const submittedAt = Date.now();
+  const done: EssayDraft = { ...essay, status: "submitted", submittedAt, savedAt: submittedAt };
+  setState({ essays: { ...state.essays, [essay.id]: done } });
+  pushAction({ type: "essay-submit", id: essay.id, submittedAt, abstract: essay.abstract, body: essay.body });
+  return done;
+}
+
+export function deleteEssay(id: string) {
+  if (!state.essays[id]) return;
+  const { [id]: _removed, ...rest } = state.essays;
+  setState({ essays: rest });
+  pushAction({ type: "essay-delete", id });
+}
+
+export function setEssaySelf(id: string, item: EssayReviewItem, rate: "good" | "mid" | "bad" | undefined) {
+  const essay = state.essays[id];
+  if (!essay) return;
+  const cur = { ...(essay.selfReview ?? {}) };
+  if (rate === undefined) delete cur[item];
+  else cur[item] = rate;
+  setState({ essays: { ...state.essays, [id]: { ...essay, selfReview: cur } } });
+  pushAction({ type: "essay-self", id, item, rate: rate ?? null });
+}
+
+export function ongoingEssayOfTopic(topicId: string): EssayDraft | undefined {
+  return Object.values(state.essays).find((e) => e.topicId === topicId && e.status === "ongoing");
+}
+
+export function essaysOfTopic(topicId: string): EssayDraft[] {
+  return Object.values(state.essays)
+    .filter((e) => e.topicId === topicId)
+    .sort((a, b) => b.startedAt - a.startedAt);
 }
 
 /* ---------------- 派生查询 ---------------- */

@@ -8,3 +8,6 @@ src/data/bank.json
 
 # 解析质检报告含第三方题面片段，同属不入仓库内容（本地复跑即生成）
 scripts/bank-report.json
+
+# 正式论文题集同题库策略，不入仓库
+src/data/essays.json

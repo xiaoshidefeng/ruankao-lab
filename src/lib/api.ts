@@ -11,7 +11,12 @@ export type ActionType =
   | { type: "attempt-save"; attempt: unknown }
   | { type: "attempt-submit"; id: string; score: number; total: number; usedSec: number }
   | { type: "attempt-delete"; id: string }
-  | { type: "case-self"; caseId: string; subqNo: number; rate: string | null };
+  | { type: "case-self"; caseId: string; subqNo: number; rate: string | null }
+  | { type: "essay-create"; essay: unknown }
+  | { type: "essay-save"; essay: unknown }
+  | { type: "essay-submit"; id: string; submittedAt: number; abstract: string; body: string }
+  | { type: "essay-delete"; id: string }
+  | { type: "essay-self"; id: string; item: string; rate: string | null };
 
 export type BackendStatus = {
   /** mysql = /api 可用；local = 纯 localStorage */

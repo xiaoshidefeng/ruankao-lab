@@ -110,3 +110,19 @@ CREATE TABLE IF NOT EXISTS case_self (
   rate     VARCHAR(8)  NOT NULL,              -- good | mid | bad
   PRIMARY KEY (user_id, case_id, subq_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 论文写作：草稿自动保存（essay-save）+ 交卷（essay-submit）+ 自评 JSON（essay-self）
+CREATE TABLE IF NOT EXISTS essays (
+  id           VARCHAR(96)  PRIMARY KEY,
+  user_id      VARCHAR(32)  NOT NULL,
+  topic_id     VARCHAR(64)  NOT NULL,
+  started_at   BIGINT       NOT NULL,
+  saved_at     BIGINT       NOT NULL,
+  abstract     MEDIUMTEXT   NOT NULL,
+  body         MEDIUMTEXT   NOT NULL,
+  elapsed_sec  INT          NOT NULL DEFAULT 0,
+  status       VARCHAR(16)  NOT NULL DEFAULT 'ongoing',  -- ongoing | submitted
+  submitted_at BIGINT       NULL,
+  self_review  JSON         NULL,                -- { 摘要合规: good|mid|bad, ... }
+  INDEX idx_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

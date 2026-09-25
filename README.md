@@ -50,6 +50,7 @@ RK_SRC_ROOT="/你的资料目录/7、模拟题" pnpm bank:parse
 | 真题模考 | 整卷连续计时、答题卡三态（已答/未答/标记）跳题、交卷二次确认、到点自动交卷、**断点续考**（进度每 5 秒落盘）、成绩单 + 逐题复盘 |
 | 错题本 | 答错自动归档；错因标记（知识/审题/计算）；**1/3/7 天间隔重现**，重练答对移出 |
 | 案例分析 | 真实大题逐问作答（草稿自动保存）→ 对照参考答案 → 给分点三档自评 |
+| 论文写作 | 4 选 1 题集 · 120 分钟倒计时 · 摘要 300–330 字与正文 ≥2000 字达标线 · 草稿自动落库断点续写 · 交卷后按四给分点自评（AI 预评二期） |
 | 统计 | 知识域掌握度（45/60 双参考线）、模考历史、触达覆盖率、30 天活跃 |
 
 ## 目录结构
@@ -59,13 +60,16 @@ scripts/parse-mocks.mjs    题库生产流水线：DOC → 结构化题库（实
 scripts/bank-report.json   每卷解析量/剔除原因（待人工复核清单）
 src/data/bank.json         正式题库（版权原因不入仓库，bank:parse 生成）
 src/data/bank.sample.json  示例题库：12 道自创题 + 1 案例 + 1 示例卷，克隆即用
+src/data/essays.sample.json 示例论文题集：4 道自创题（正式题集 essays.json 同样不入仓库）
+src/lib/types.ts           数据模型（对应方案 §06 的 questions JSONB schema）
+src/lib/grading.ts         判分纯函数（vitest 单测覆盖：src/lib/grading.test.ts）
 src/lib/types.ts           数据模型（对应方案 §06 的 questions JSONB schema）
 src/lib/grading.ts         判分纯函数（客观题判分零副作用）
 src/lib/store.ts           状态树 + 派生查询；localStorage 兜底，探测 /api 后自动切 MySQL 模式
 src/lib/api.ts             MySQL 后端客户端：探测/水合/动作微批推送
 server/                    本地 API（Express + mysql2）：schema、种子、动作落库
 src/components/            题卡（练习/模考/复盘三形态）、答题卡、目标环、掌握度条
-src/views/                 六个页面的视图组件
+src/views/                 七个页面的视图组件
 ```
 
 ## 数据来源与可信度
@@ -88,7 +92,8 @@ src/views/                 六个页面的视图组件
 ## 路线图（对齐实施方案 Phase 1–4）
 
 - [x] Phase 1 · Web MVP：章节练习、真题模考、答题卡、错题本、学习统计
-- [x] Phase 2（部分）· 案例分析逐问自评；论文写作器 + AI 批改待做
+- [x] Phase 2（大半）· 案例分析逐问自评；论文写作器 v1（计时/字数达标线/断点续写/自评落库）；AI 批改 + 范文库对照待做
+- [x] 质量基建 · 判分纯函数 vitest 单测 + CI（构建 + MySQL 冒烟）
 - [ ] 题库管线升级：扫描版 PDF 的 OCR 接入（当前管线只吃带文字层的 DOC）
 - [ ] 管理后台：题库复核、章节归类修正、组卷规则配置
 - [ ] Next.js/NestJS + PostgreSQL + 微信小程序（Taro）多端同源

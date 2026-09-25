@@ -7,6 +7,7 @@ import { PracticeView } from "./views/PracticeView";
 import { MockView } from "./views/MockView";
 import { WrongBookView } from "./views/WrongBookView";
 import { CaseView } from "./views/CaseView";
+import { EssayView } from "./views/EssayView";
 import { StatsView } from "./views/StatsView";
 
 type Route = { view: string; param?: string };
@@ -23,6 +24,7 @@ const NAV: { id: string; label: string; no: string; hash: string }[] = [
   { id: "mock", label: "真题模考", no: "02", hash: "#/mock" },
   { id: "wrong", label: "错题本", no: "03", hash: "#/wrong" },
   { id: "case", label: "案例分析", no: "04", hash: "#/case" },
+  { id: "essay", label: "论文写作", no: "06", hash: "#/essay" },
   { id: "stats", label: "统计", no: "05", hash: "#/stats" },
 ];
 
@@ -67,6 +69,9 @@ export function App() {
       break;
     case "case":
       body = <CaseView caseId={route.param} />;
+      break;
+    case "essay":
+      body = <EssayView topicId={route.param} />;
       break;
     case "stats":
       body = <StatsView />;
